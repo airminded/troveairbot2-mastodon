@@ -1,4 +1,6 @@
-# Trove Air Bot 2
+# Trove Air Bot 2 for Mastodon
+
+Modified by [Brett Holman](https://airminded.org) to run on Mastodon instead of Twitter.
 
 Modified by [Brett Holman](https://twitter.com/Airminded) from [Trove Title Bot 2](https://glitch.com/~trove-title-bot-2) by [Tim Sherratt](https://twitter.com/wragge).
 
