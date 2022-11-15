@@ -1,0 +1,24 @@
+{
+  "//1": "Trove Title Bot",
+  "//2": "https://docs.npmjs.com/files/package.json",
+  "//3": "updating this file will download and update your packages",
+  "name": "trove-title-bot-2",
+  "version": "0.2.0",
+  "description": "Twitter bot sharing articles from specified newspapers in Trove.",
+  "scripts": {
+    "start": "bash installReqsAndStart.sh"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": "9.x"
+  },
+  "repository": {
+    "url": "https://glitch.com/edit/#!/trove-title-bot-2"
+  },
+  "license": "MIT",
+  "keywords": [
+    "python",
+    "glitch",
+    "Trove"
+  ]
+}
