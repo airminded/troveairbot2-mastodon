@@ -23,7 +23,6 @@ with open('stopwords.json', 'r') as json_file:
 
 app = Flask(__name__)
 
-###could use for Mastodon token
 APP_KEY = os.environ.get('APP_KEY')
 TOKEN = os.environ.get('TOKEN')
 INSTANCE = os.environ.get('INSTANCE')
@@ -52,7 +51,7 @@ def truncate(message, length):
 
 def prepare_message(item):
     #airminded - customise tweet introduction (could use keyword here)
-    greeting = 'Another Australian newspaper article about aviation!'
+    greeting = 'This Australian newspaper article features the keyword ' + random_word + ' : '
     details = None
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     title = truncate(item['heading'], 200)
@@ -151,7 +150,7 @@ def get_random_article(query, **kwargs):
         response = s.get(API_URL, params=params)
         data = response.json()
         article = random.choice(data['response']['zone'][0]['records']['article'])
-        return article
+        return article, random_word
 
 
 @app.route('/random/')
