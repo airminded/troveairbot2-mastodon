@@ -49,8 +49,9 @@ def truncate(message, length):
   return message
 
 
-def prepare_message(item, key):
+def prepare_message(item):
     #airminded - customise tweet introduction (could use keyword here)
+    key = 'air raid'
     greeting = 'This Australian newspaper article features the keyword ' + key + ' : '
     details = None
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
@@ -162,7 +163,7 @@ def tweet_random():
         #airminded - send keyword instead of newspaper_id
         article = get_random_article(keyword, category='Article')
         if article:
-            message = prepare_message(article, keyword)
+            message = prepare_message(article)
             print(message)
             tweet(message)
             status = f'<p>I tweeted!<p> <blockquote>{message}</blockquote>'
