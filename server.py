@@ -160,6 +160,7 @@ def tweet_random():
     if authorised(request):
         #airminded - choose random keyword from KEYWORDS instead of newspaper_id from TITLES
         keyword = random.choice(KEYWORDS.split(','))
+        print(keyword)
         #airminded - send keyword instead of newspaper_id
         article = get_random_article(keyword, category='Article')
         if article:
