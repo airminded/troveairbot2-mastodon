@@ -102,6 +102,7 @@ def get_random_article(query, **kwargs):
     Get a random article.
     The kwargs can be any of the available facets, such as 'state', 'title', 'illtype', 'year'.
     '''
+    print(query)
     total = 0
     applied_facets = []
     facets = ['month', 'year', 'decade', 'word', 'illustrated', 'category', 'title']
