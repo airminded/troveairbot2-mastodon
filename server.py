@@ -41,6 +41,7 @@ def tweet(message):
             }
     data =      {  'status': message  }
     response = requests.request(method = "POST", url = url, data = json.dumps(data), headers = headers)
+    print(url)
     print(response)
 
 
