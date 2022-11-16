@@ -49,9 +49,9 @@ def truncate(message, length):
   return message
 
 
-def prepare_message(item):
+def prepare_message(item, key):
     #airminded - customise tweet introduction (could use keyword here)
-    greeting = 'This Australian newspaper article features the keyword ' + random_word + ' : '
+    greeting = 'This Australian newspaper article features the keyword ' + key + ' : '
     details = None
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     title = truncate(item['heading'], 200)
@@ -150,7 +150,7 @@ def get_random_article(query, **kwargs):
         response = s.get(API_URL, params=params)
         data = response.json()
         article = random.choice(data['response']['zone'][0]['records']['article'])
-        return article, random_word
+        return article
 
 
 @app.route('/random/')
@@ -162,7 +162,7 @@ def tweet_random():
         #airminded - send keyword instead of newspaper_id
         article = get_random_article(keyword, category='Article')
         if article:
-            message = prepare_message(article)
+            message = prepare_message(article, keyword)
             print(message)
             tweet(message)
             status = f'<p>I tweeted!<p> <blockquote>{message}</blockquote>'
