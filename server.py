@@ -51,8 +51,7 @@ def truncate(message, length):
 
 def prepare_message(item, key):
     #airminded - customise tweet introduction (could use keyword here)
-###    key = 'air raid'
-    greeting = 'This Australian newspaper article features the keyword ' + key + ' : '
+    greeting = 'This Australian newspaper article contains the keyword ' + key + ' : '
     details = None
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     title = truncate(item['heading'], 200)
