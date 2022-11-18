@@ -1,12 +1,14 @@
 # Trove Air Bot 2 for Mastodon
 
-Modified by [Brett Holman](https://airminded.org) to post to Mastodon instead of Twitter. It is now optimised to rub on Heroku (rather than Glitch). The following config vars will need to be defined on Heroku:
+Modified by [Brett Holman](https://airminded.org) to post to Mastodon instead of Twitter. It is now optimised to run on Heroku (rather than Glitch). The following config vars will need to be defined on Heroku:
 
 * APP_KEY - see Tim's instructions below
 * INSTANCE - of your Mastodon account
 * KEYWORDS - see my instructions below. (Recommend enclosing in double quotes.)
 * TOKEN - from your bot's Mastodon account
 * TROVE_API_KEY - see Tim's instructions below
+
+# Trove Air Bot 2
 
 Modified by [Brett Holman](https://twitter.com/Airminded) from [Trove Title Bot 2](https://glitch.com/~trove-title-bot-2) by [Tim Sherratt](https://twitter.com/wragge).
 
