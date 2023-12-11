@@ -46,12 +46,14 @@ client.login(BLUESKY_EMAIL, BLUESKY_PASSWORD)
 
 def bluesky(message,item):
     url = f'http://nla.gov.au/nla.news-article{item["id"]}'
-    title = truncate(item['heading'], 200)
+    article_title = truncate(item['heading'], 200)
    # description = truncate(item['title'], 200)
+    newspaper_title = truncate(item['title'], 200)
     embed_external = models.AppBskyEmbedExternal.Main(
         external=models.AppBskyEmbedExternal.External(
-            title=title,
-            description='Trove Newspapers article',
+            title=article_title,
+           # description='Trove Newspapers article',
+            description=newspaper_title,
             uri=url,
         )
     )
