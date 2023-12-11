@@ -41,7 +41,7 @@ def tweet(message):
     response = requests.request(method = "POST", url = url, data = json.dumps(data), headers = headers)
 
 ### bluesky
-def bluesky(message,id):
+def bluesky(message,item):
     url = f'http://nla.gov.au/nla.news-article{item["id"]}'
     embed_external = models.AppBskyEmbedExternal.Main(
         external=models.AppBskyEmbedExternal.External(
@@ -185,7 +185,7 @@ def tweet_random():
             message = prepare_message(article, keyword)
             print(message)
             tweet(message)
-            bluesky(message,id)
+            bluesky(message,item)
             status = f'<p>I tweeted!<p> <blockquote>{message}</blockquote>'
         else:
             status = 'sorry, couldn\'t get data from Trove'
