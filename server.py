@@ -7,6 +7,7 @@ import arrow
 import time
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+from atproto import Client,models
 
 s = requests.Session()
 retries = Retry(total=5, backoff_factor=1, status_forcelist=[ 502, 503, 504 ])
@@ -25,6 +26,8 @@ API_KEY = os.environ.get('TROVE_API_KEY')
 #airminded - KEYWORDS replaces TITLES (although functionally equivalent)
 KEYWORDS = os.environ.get('KEYWORDS')
 API_URL = 'http://api.trove.nla.gov.au/v2/result'
+BLUESKY_EMAIL = os.environ.get('BLUESKY_EMAIL')
+BLUESKY_PASSWORD = os.environ.get('BLUESKY_PASSWORD'])
 
 ###convert to mastodon
 def tweet(message):
@@ -36,6 +39,25 @@ def tweet(message):
             }
     data =      {  'status': message  }
     response = requests.request(method = "POST", url = url, data = json.dumps(data), headers = headers)
+
+### bluesky
+def bluesky(message,article_url):
+    embed_external = models.AppBskyEmbedExternal.Main(
+        external=models.AppBskyEmbedExternal.External(
+            title='Trove',
+            description='Trove Newspapers article',
+            uri=article_url,
+        )
+    )
+    post_with_link_card = client.com.atproto.repo.create_record(
+        models.ComAtprotoRepoCreateRecord.Data(
+            repo=client.me.did,  # or any another DID
+            collection=models.ids.AppBskyFeedPost,
+            record=models.AppBskyFeedPost.Main(
+                created_at=client.get_current_time_iso(), text=message, embed=embed_external
+            ),
+        )
+    )
 
 
 def truncate(message, length):
@@ -162,6 +184,7 @@ def tweet_random():
             message = prepare_message(article, keyword)
             print(message)
             tweet(message)
+            bluesky(message,article_url)
             status = f'<p>I tweeted!<p> <blockquote>{message}</blockquote>'
         else:
             status = 'sorry, couldn\'t get data from Trove'
