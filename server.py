@@ -1,4 +1,4 @@
-ifrom flask import Flask, render_template, request, Response, jsonify
+from flask import Flask, render_template, request, Response, jsonify
 import requests
 import os
 import json
@@ -52,8 +52,8 @@ def bluesky(message,item):
     embed_external = models.AppBskyEmbedExternal.Main(
         external=models.AppBskyEmbedExternal.External(
             title=article_title,
-            description='Trove Newspapers article',
-            #description=newspaper_title,
+            #description='Trove Newspapers article',
+            description=newspaper_title,
             uri=url,
         )
     )
