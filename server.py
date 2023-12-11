@@ -41,6 +41,9 @@ def tweet(message):
     response = requests.request(method = "POST", url = url, data = json.dumps(data), headers = headers)
 
 ### bluesky
+client = Client()
+client.login(BLUESKY_EMAIL, BLUESKY_PASSWORD)
+
 def bluesky(message,item):
     url = f'http://nla.gov.au/nla.news-article{item["id"]}'
     embed_external = models.AppBskyEmbedExternal.Main(
