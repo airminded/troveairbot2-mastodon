@@ -177,7 +177,7 @@ def get_random_article(query, **kwargs):
         response = s.get(API_URL, params=params)
         data = response.json()
         article = random.choice(data['response']['zone'][0]['records']['article'])
-        print article
+        print(article)
         return article
 
 
