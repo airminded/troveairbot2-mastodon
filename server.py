@@ -41,12 +41,13 @@ def tweet(message):
     response = requests.request(method = "POST", url = url, data = json.dumps(data), headers = headers)
 
 ### bluesky
-def bluesky(message,article_url):
+def bluesky(message,id):
+    url = f'http://nla.gov.au/nla.news-article{item["id"]}'
     embed_external = models.AppBskyEmbedExternal.Main(
         external=models.AppBskyEmbedExternal.External(
             title='Trove',
             description='Trove Newspapers article',
-            uri=article_url,
+            uri=url,
         )
     )
     post_with_link_card = client.com.atproto.repo.create_record(
@@ -184,7 +185,7 @@ def tweet_random():
             message = prepare_message(article, keyword)
             print(message)
             tweet(message)
-            bluesky(message,url)
+            bluesky(message,id)
             status = f'<p>I tweeted!<p> <blockquote>{message}</blockquote>'
         else:
             status = 'sorry, couldn\'t get data from Trove'
