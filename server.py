@@ -46,6 +46,7 @@ client.login(BLUESKY_EMAIL, BLUESKY_PASSWORD)
 
 def bluesky(message,item):
     url = f'http://nla.gov.au/nla.news-article{item["id"]}'
+    title = truncate(item['heading'], 200)
     embed_external = models.AppBskyEmbedExternal.Main(
         external=models.AppBskyEmbedExternal.External(
             title=title,
