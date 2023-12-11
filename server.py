@@ -49,7 +49,6 @@ def bluesky(message,item):
     article_title = truncate(item['heading'], 200)
    # description = truncate(item['title'], 200)
     newspaper_title = item['title']['value']
-    title_value = variable['title']['value']
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     embed_external = models.AppBskyEmbedExternal.Main(
         external=models.AppBskyEmbedExternal.External(
