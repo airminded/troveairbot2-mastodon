@@ -49,11 +49,12 @@ def bluesky(message,item):
     article_title = truncate(item['heading'], 200)
    # description = truncate(item['title'], 200)
     newspaper_title = truncate(item['heading'], 200)
+    date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     embed_external = models.AppBskyEmbedExternal.Main(
         external=models.AppBskyEmbedExternal.External(
             title=article_title,
             #description='Trove Newspapers article',
-            description=newspaper_title,
+            description=date,
             uri=url,
         )
     )
@@ -191,7 +192,7 @@ def tweet_random():
         if article:
             message = prepare_message(article, keyword)
             print(message)
-            tweet(message)
+            #tweet(message)
             bluesky(message,article)
             status = f'<p>I tweeted!<p> <blockquote>{message}</blockquote>'
         else:
