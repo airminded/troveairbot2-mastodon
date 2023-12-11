@@ -27,7 +27,7 @@ API_KEY = os.environ.get('TROVE_API_KEY')
 KEYWORDS = os.environ.get('KEYWORDS')
 API_URL = 'http://api.trove.nla.gov.au/v2/result'
 BLUESKY_EMAIL = os.environ.get('BLUESKY_EMAIL')
-BLUESKY_PASSWORD = os.environ.get('BLUESKY_PASSWORD'])
+BLUESKY_PASSWORD = os.environ.get('BLUESKY_PASSWORD')
 
 ###convert to mastodon
 def tweet(message):
