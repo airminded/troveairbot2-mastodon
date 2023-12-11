@@ -185,7 +185,7 @@ def tweet_random():
             message = prepare_message(article, keyword)
             print(message)
             tweet(message)
-            bluesky(message,item)
+            bluesky(message,article)
             status = f'<p>I tweeted!<p> <blockquote>{message}</blockquote>'
         else:
             status = 'sorry, couldn\'t get data from Trove'
