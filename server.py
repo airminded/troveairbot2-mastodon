@@ -52,8 +52,8 @@ def bluesky(message,item):
     embed_external = models.AppBskyEmbedExternal.Main(
         external=models.AppBskyEmbedExternal.External(
             title=article_title,
-           # description='Trove Newspapers article',
-            description=newspaper_title,
+            description='Trove Newspapers article',
+            #description=newspaper_title,
             uri=url,
         )
     )
