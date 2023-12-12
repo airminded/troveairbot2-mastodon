@@ -42,7 +42,7 @@ def mastodon_post(message):
 
 
 
-def bluesky_post(message):
+def bluesky_post(message, item):
     bluesky_client = Client()
     bluesky_client.login(BLUESKY_EMAIL, BLUESKY_PASSWORD)
     
@@ -180,8 +180,7 @@ def post_random():
             message = prepare_post(article, keyword)
             print(message)
             #mastodon_post(message)
-            #bluesky_post(message, article)
-            bluesky_post(message)
+            bluesky_post(message, article)
             status = f'<p>I posted!<p> <blockquote>{message}</blockquote>'
         else:
             status = 'sorry, couldn\'t get data from Trove'
