@@ -39,21 +39,20 @@ def mastodon_post(message):
     response = requests.request(method="POST", url=mastodon_url, data=json.dumps(data), headers=headers)
 
 
-
-
-
 def bluesky_post(message, item):
     bluesky_client = Client()
     bluesky_client.login(BLUESKY_EMAIL, BLUESKY_PASSWORD)
     
     article_url = f'http://nla.gov.au/nla.news-article{item["id"]}'
     article_title = truncate_text(item['heading'], 200)
+    article_snippet = item['snippet']
     newspaper_title = item['title']['value']
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     embed_external = models.AppBskyEmbedExternal.Main(
         external=models.AppBskyEmbedExternal.External(
             title=article_title,
-            description=newspaper_title,
+            description=article_snippet,
+            #description=newspaper_title,
             uri=article_url,
         )
     )
