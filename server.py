@@ -76,7 +76,7 @@ def truncate_text(text, length):
     return text
 
 
-def prepare_tweet(item, key):
+def prepare_post(item, key):
     greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
     details = None
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
@@ -95,7 +95,7 @@ def is_authorized(request):
 
 @app.route('/')
 def home():
-    return 'hello, I\'m ready to tweet'
+    return 'hello, I\'m ready to post'
 
 
 def get_random_facet_value(params, facet):
@@ -170,18 +170,19 @@ def get_random_article(query, **kwargs):
 
 
 @app.route('/random/')
-def tweet_random():
-    status = 'nothing to tweet'
+def post_random():
+    status = 'nothing to post'
     if is_authorized(request):
         keyword = random.choice(KEYWORDS.split(','))
         print(keyword)
         article = get_random_article(keyword, category='Article')
         if article:
-            message = prepare_tweet(article, keyword)
+            message = prepare_post(article, keyword)
             print(message)
-            # mastodon_post(message)
-            bluesky_post(message, article)
-            status = f'<p>I tweeted!<p> <blockquote>{message}</blockquote>'
+            #mastodon_post(message)
+            #bluesky_post(message, article)
+            bluesky_post(message)
+            status = f'<p>I posted!<p> <blockquote>{message}</blockquote>'
         else:
             status = 'sorry, couldn\'t get data from Trove'
     else:
