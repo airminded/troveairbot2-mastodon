@@ -1,4 +1,6 @@
-# Trove Air Bot 2 for Mastodon
+# Trove Air Bot 2 for Mastodon and Bluesky
+
+(Bluesky notes coming soon...)
 
 Modified by [Brett Holman](https://airminded.org) to post to Mastodon instead of Twitter. It is now optimised to run on Heroku (rather than Glitch). The following config vars will need to be defined on Heroku:
 
