@@ -42,7 +42,7 @@ def mastodon_post(message):
 
 
 
-def bluesky_post(message, item):
+def bluesky_post(message):
     bluesky_client = Client()
     bluesky_client.login(BLUESKY_EMAIL, BLUESKY_PASSWORD)
     
