@@ -28,7 +28,7 @@ BLUESKY_EMAIL = os.environ.get('BLUESKY_EMAIL')
 BLUESKY_PASSWORD = os.environ.get('BLUESKY_PASSWORD')
 
 
-def toot(message):
+def mastodon_post(message):
     mastodon_url = "https://" + INSTANCE + "/api/v1/statuses"
     headers = {
         'Accept': 'application/json',
@@ -39,11 +39,13 @@ def toot(message):
     response = requests.request(method="POST", url=mastodon_url, data=json.dumps(data), headers=headers)
 
 
-bluesky_client = Client()
-bluesky_client.login(BLUESKY_EMAIL, BLUESKY_PASSWORD)
+
 
 
 def bluesky_post(message, item):
+    bluesky_client = Client()
+    bluesky_client.login(BLUESKY_EMAIL, BLUESKY_PASSWORD)
+    
     article_url = f'http://nla.gov.au/nla.news-article{item["id"]}'
     article_title = truncate_text(item['heading'], 200)
     newspaper_title = item['title']['value']
@@ -177,13 +179,13 @@ def tweet_random():
         if article:
             message = prepare_tweet(article, keyword)
             print(message)
-            # toot(message)
+            # mastodon_post(message)
             bluesky_post(message, article)
             status = f'<p>I tweeted!<p> <blockquote>{message}</blockquote>'
         else:
             status = 'sorry, couldn\'t get data from Trove'
     else:
-        status = 'sorry, not authorized to tweet'
+        status = 'sorry, not authorised to post'
     return status
 
 
