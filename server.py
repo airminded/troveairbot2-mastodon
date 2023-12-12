@@ -90,7 +90,6 @@ def prepare_bluesky_post(item, key):
     details = None
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     title = truncate_text(item['heading'], 200)
-    snippet = truncate_text(item['snippet'], 200)
     message = f"{greeting} {date}, '{title}'"
     return message
 
@@ -188,7 +187,7 @@ def post_random():
         if article:
             message = prepare_mastodon_post(article, keyword)
             print(message)
-            #mastodon_post(message)
+            mastodon_post(message)
             message = prepare_bluesky_post(article, keyword)
             bluesky_post(message, article)
             status = f'<p>I posted!<p> <blockquote>{message}</blockquote>'
