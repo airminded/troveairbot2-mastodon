@@ -23,7 +23,8 @@ TOKEN = os.environ.get('TOKEN')
 INSTANCE = os.environ.get('INSTANCE')
 API_KEY = os.environ.get('TROVE_API_KEY')
 KEYWORDS = os.environ.get('KEYWORDS')
-API_URL = 'http://api.trove.nla.gov.au/v2/result'
+API_URL = 'http://api.trove.nla.gov.au/v3/result'
+#API_URL = 'http://api.trove.nla.gov.au/v2/result'
 BLUESKY_EMAIL = os.environ.get('BLUESKY_EMAIL')
 BLUESKY_PASSWORD = os.environ.get('BLUESKY_PASSWORD')
 
@@ -115,7 +116,8 @@ def get_random_facet_value(params, facet):
     response = session.get(API_URL, params=these_params)
     data = response.json()
     try:
-        values = [t['search'] for t in data['response']['zone'][0]['facets']['facet']['term']]
+        values = [t['search'] for t in data['response']['category'][0]['facets']['facet']['term']]
+   #             values = [t['search'] for t in data['response']['zone'][0]['facets']['facet']['term']]
     except TypeError:
         return None
     return random.choice(values)
@@ -124,7 +126,8 @@ def get_random_facet_value(params, facet):
 def get_total_results(params):
     response = session.get(API_URL, params=params)
     data = response.json()
-    total = int(data['response']['zone'][0]['records']['total'])
+    total = int(data['response']['category'][0]['records']['total'])
+    #        total = int(data['response']['zone'][0]['records']['total'])
     return total
 
 
@@ -139,7 +142,8 @@ def get_random_article(query, **kwargs):
     facets = ['month', 'year', 'decade', 'word', 'illustrated', 'category', 'title']
     tries = 0
     params = {
-        'zone': 'newspaper',
+        'category': 'newspaper',
+ #               'zone': 'newspaper',
         'encoding': 'json',
         'n': '0',
         'key': API_KEY
@@ -172,7 +176,8 @@ def get_random_article(query, **kwargs):
         params['n'] = '100'
         response = session.get(API_URL, params=params)
         data = response.json()
-        article = random.choice(data['response']['zone'][0]['records']['article'])
+        article = random.choice(data['response']['category'][0]['records']['article'])
+   #             article = random.choice(data['response']['zone'][0]['records']['article'])
         print(article)
         return article
 
