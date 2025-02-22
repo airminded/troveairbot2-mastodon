@@ -50,7 +50,7 @@ def bluesky_post(message, item):
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     
     embed_external = models.AppBskyEmbedExternal(
-        external=models.AppBskyEmbedExternalExternal(
+        external=models.AppBskyEmbedExternal.External(
             title=article_title,
             description=article_snippet,
             uri=article_url,
