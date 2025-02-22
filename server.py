@@ -5,7 +5,7 @@ import json
 import random
 import arrow
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+from urllib3.util.retry import Retry
 from atproto import Client, models
 
 session = requests.Session()
@@ -46,20 +46,22 @@ def bluesky_post(message, item):
     article_url = f'http://nla.gov.au/nla.news-article{item["id"]}'
     article_title = truncate_text(item['heading'], 200)
     article_snippet = item['snippet']
-    newspaper_title = item['title']['title']  # Updated to use the correct key
+    newspaper_title = item['title']['title']
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
-    embed_external = models.AppBskyEmbedExternal.Main(
-        external=models.AppBskyEmbedExternal.External(
+    
+    embed_external = models.AppBskyEmbedExternal(
+        external=models.AppBskyEmbedExternalExternal(
             title=article_title,
             description=article_snippet,
             uri=article_url,
         )
     )
+    
     post_with_link_card = bluesky_client.com.atproto.repo.create_record(
-        models.ComAtprotoRepoCreateRecord.Data(
+        models.ComAtprotoRepoCreateRecord(
             repo=bluesky_client.me.did,
             collection=models.ids.AppBskyFeedPost,
-            record=models.AppBskyFeedPost.Main(
+            record=models.AppBskyFeedPost(
                 created_at=bluesky_client.get_current_time_iso(),
                 text=message,
                 embed=embed_external
@@ -106,16 +108,13 @@ def home():
 
 
 def get_random_facet_value(params, facet):
-    '''
-    Get values for the supplied facet and choose one at random.
-    '''
     these_params = params.copy()
     these_params['facet'] = facet
     these_params['category'] = 'newspaper'
     try:
         response = session.get(API_URL, params=these_params)
         data = response.json()
-        print(data)  # Add this line to inspect the data structure
+        print(data)
         try:
             values = [t['search'] for t in data['category'][0]['facets'][facet]['term']]
         except (TypeError, KeyError):
@@ -131,12 +130,11 @@ def get_total_results(params):
     try:
         response = session.get(API_URL, params=params)
         data = response.json()
-        print(data)  # Add this line to inspect the data structure
+        print(data)
         if 'category' in data and len(data['category']) > 0:
             total = int(data['category'][0]['records']['total'])
         else:
-            # Handle the case where 'category' key is missing
-            total = 0  # or raise an exception, or handle appropriately
+            total = 0
         return total
     except requests.exceptions.RetryError as e:
         print(f"RetryError: {e}")
@@ -144,10 +142,6 @@ def get_total_results(params):
 
 
 def get_random_article(query, **kwargs):
-    '''
-    Get a random article.
-    The kwargs can be any of the available facets, such as 'state', 'title', 'illtype', 'year'.
-    '''
     print(query)
     total = 0
     applied_facets = []
@@ -189,7 +183,7 @@ def get_random_article(query, **kwargs):
         try:
             response = session.get(API_URL, params=params)
             data = response.json()
-            print(data)  # Add this line to inspect the data structure
+            print(data)
             if 'category' in data and len(data['category']) > 0:
                 article = random.choice(data['category'][0]['records']['article'])
                 print(article)
