@@ -9,7 +9,7 @@ from requests.packages.urllib3.util.retry import Retry
 from atproto import Client, models
 
 session = requests.Session()
-retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504])
+retries = Retry(total=10, backoff_factor=2, status_forcelist=[502, 503, 504])
 session.mount('https://', HTTPAdapter(max_retries=retries))
 session.mount('http://', HTTPAdapter(max_retries=retries))
 
@@ -23,7 +23,7 @@ TOKEN = os.environ.get('TOKEN')
 INSTANCE = os.environ.get('INSTANCE')
 API_KEY = os.environ.get('TROVE_API_KEY')
 KEYWORDS = os.environ.get('KEYWORDS')
-API_URL = 'http://api.trove.nla.gov.au/v2/result'
+API_URL = 'https://api.trove.nla.gov.au/v3/result'
 BLUESKY_EMAIL = os.environ.get('BLUESKY_EMAIL')
 BLUESKY_PASSWORD = os.environ.get('BLUESKY_PASSWORD')
 
@@ -46,7 +46,7 @@ def bluesky_post(message, item):
     article_url = f'http://nla.gov.au/nla.news-article{item["id"]}'
     article_title = truncate_text(item['heading'], 200)
     article_snippet = item['snippet']
-    newspaper_title = item['title']['value']
+    newspaper_title = item['title']['title']  # Updated to use the correct key
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     embed_external = models.AppBskyEmbedExternal.Main(
         external=models.AppBskyEmbedExternal.External(
@@ -112,20 +112,36 @@ def get_random_facet_value(params, facet):
     '''
     these_params = params.copy()
     these_params['facet'] = facet
-    response = session.get(API_URL, params=these_params)
-    data = response.json()
+    these_params['category'] = 'newspaper'
     try:
-        values = [t['search'] for t in data['response']['zone'][0]['facets']['facet']['term']]
-    except TypeError:
+        response = session.get(API_URL, params=these_params)
+        data = response.json()
+        print(data)  # Add this line to inspect the data structure
+        try:
+            values = [t['search'] for t in data['category'][0]['facets'][facet]['term']]
+        except (TypeError, KeyError):
+            return None
+        return random.choice(values)
+    except requests.exceptions.RetryError as e:
+        print(f"RetryError: {e}")
         return None
-    return random.choice(values)
 
 
 def get_total_results(params):
-    response = session.get(API_URL, params=params)
-    data = response.json()
-    total = int(data['response']['zone'][0]['records']['total'])
-    return total
+    params['category'] = 'newspaper'
+    try:
+        response = session.get(API_URL, params=params)
+        data = response.json()
+        print(data)  # Add this line to inspect the data structure
+        if 'category' in data and len(data['category']) > 0:
+            total = int(data['category'][0]['records']['total'])
+        else:
+            # Handle the case where 'category' key is missing
+            total = 0  # or raise an exception, or handle appropriately
+        return total
+    except requests.exceptions.RetryError as e:
+        print(f"RetryError: {e}")
+        return 0
 
 
 def get_random_article(query, **kwargs):
@@ -142,7 +158,8 @@ def get_random_article(query, **kwargs):
         'zone': 'newspaper',
         'encoding': 'json',
         'n': '0',
-        'key': API_KEY
+        'key': API_KEY,
+        'category': 'newspaper'
     }
     if query:
         params['q'] = query
@@ -170,11 +187,19 @@ def get_random_article(query, **kwargs):
 
     if total > 0:
         params['n'] = '100'
-        response = session.get(API_URL, params=params)
-        data = response.json()
-        article = random.choice(data['response']['zone'][0]['records']['article'])
-        print(article)
-        return article
+        try:
+            response = session.get(API_URL, params=params)
+            data = response.json()
+            print(data)  # Add this line to inspect the data structure
+            if 'category' in data and len(data['category']) > 0:
+                article = random.choice(data['category'][0]['records']['article'])
+                print(article)
+                return article
+            else:
+                return None
+        except requests.exceptions.RetryError as e:
+            print(f"RetryError: {e}")
+            return None
 
 
 @app.route('/random/')
