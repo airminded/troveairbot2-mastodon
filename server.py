@@ -118,7 +118,7 @@ def get_random_facet_value(params, facet):
         data = response.json()
         print(data)  # Add this line to inspect the data structure
         try:
-            values = [t['search'] for t in data['response']['zone'][0]['facets']['facet']['term']]
+            values = [t['search'] for t in data['category'][0]['facets'][facet]['term']]
         except (TypeError, KeyError):
             return None
         return random.choice(values)
@@ -133,10 +133,10 @@ def get_total_results(params):
         response = session.get(API_URL, params=params)
         data = response.json()
         print(data)  # Add this line to inspect the data structure
-        if 'response' in data and 'zone' in data['response']:
-            total = int(data['response']['zone'][0]['records']['total'])
+        if 'category' in data and len(data['category']) > 0:
+            total = int(data['category'][0]['records']['total'])
         else:
-            # Handle the case where 'response' or 'zone' key is missing
+            # Handle the case where 'category' key is missing
             total = 0  # or raise an exception, or handle appropriately
         return total
     except requests.exceptions.RetryError as e:
@@ -191,8 +191,8 @@ def get_random_article(query, **kwargs):
             response = session.get(API_URL, params=params)
             data = response.json()
             print(data)  # Add this line to inspect the data structure
-            if 'response' in data and 'zone' in data['response']:
-                article = random.choice(data['response']['zone'][0]['records']['article'])
+            if 'category' in data and len(data['category']) > 0:
+                article = random.choice(data['category'][0]['records']['article'])
                 print(article)
                 return article
             else:
