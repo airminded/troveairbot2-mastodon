@@ -23,8 +23,7 @@ TOKEN = os.environ.get('TOKEN')
 INSTANCE = os.environ.get('INSTANCE')
 API_KEY = os.environ.get('TROVE_API_KEY')
 KEYWORDS = os.environ.get('KEYWORDS')
-API_URL = 'http://api.trove.nla.gov.au/v3/result'
-#API_URL = 'http://api.trove.nla.gov.au/v2/result'
+API_URL = 'http://api.trove.nla.gov.au/v2/result'
 BLUESKY_EMAIL = os.environ.get('BLUESKY_EMAIL')
 BLUESKY_PASSWORD = os.environ.get('BLUESKY_PASSWORD')
 
@@ -115,10 +114,10 @@ def get_random_facet_value(params, facet):
     these_params['facet'] = facet
     response = session.get(API_URL, params=these_params)
     data = response.json()
+    print(data)  # Add this line to inspect the data structure
     try:
-        values = [t['search'] for t in data['response']['category'][0]['facets']['facet']['term']]
-   #             values = [t['search'] for t in data['response']['zone'][0]['facets']['facet']['term']]
-    except TypeError:
+        values = [t['search'] for t in data['response']['zone'][0]['facets']['facet']['term']]
+    except (TypeError, KeyError):
         return None
     return random.choice(values)
 
@@ -126,8 +125,12 @@ def get_random_facet_value(params, facet):
 def get_total_results(params):
     response = session.get(API_URL, params=params)
     data = response.json()
-    total = int(data['response']['category'][0]['records']['total'])
-    #        total = int(data['response']['zone'][0]['records']['total'])
+    print(data)  # Add this line to inspect the data structure
+    if 'response' in data and 'zone' in data['response']:
+        total = int(data['response']['zone'][0]['records']['total'])
+    else:
+        # Handle the case where 'response' or 'zone' key is missing
+        total = 0  # or raise an exception, or handle appropriately
     return total
 
 
@@ -142,8 +145,7 @@ def get_random_article(query, **kwargs):
     facets = ['month', 'year', 'decade', 'word', 'illustrated', 'category', 'title']
     tries = 0
     params = {
-        'category': 'newspaper',
- #               'zone': 'newspaper',
+        'zone': 'newspaper',
         'encoding': 'json',
         'n': '0',
         'key': API_KEY
@@ -176,10 +178,13 @@ def get_random_article(query, **kwargs):
         params['n'] = '100'
         response = session.get(API_URL, params=params)
         data = response.json()
-        article = random.choice(data['response']['category'][0]['records']['article'])
-   #             article = random.choice(data['response']['zone'][0]['records']['article'])
-        print(article)
-        return article
+        print(data)  # Add this line to inspect the data structure
+        if 'response' in data and 'zone' in data['response']:
+            article = random.choice(data['response']['zone'][0]['records']['article'])
+            print(article)
+            return article
+        else:
+            return None
 
 
 @app.route('/random/')
