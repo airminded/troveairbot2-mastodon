@@ -1,6 +1,8 @@
 # Trove Air Bot 2 for Mastodon and Bluesky
 
-(Bluesky notes coming soon...)
+(~~Bluesky notes coming soon~~...)
+
+20250222: updated to use Trove API V3: https://api.trove.nla.gov.au/v3/index.html
 
 Modified by [Brett Holman](https://airminded.org) to post to Mastodon instead of Twitter. It is now optimised to run on Heroku (rather than Glitch). The following config vars will need to be defined on Heroku:
 
