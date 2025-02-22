@@ -46,7 +46,7 @@ def bluesky_post(message, item):
     article_url = f'http://nla.gov.au/nla.news-article{item["id"]}'
     article_title = truncate_text(item['heading'], 200)
     article_snippet = item['snippet']
-    newspaper_title = item['title']['value']
+    newspaper_title = item['title']['title']  # Updated to use the correct key
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     embed_external = models.AppBskyEmbedExternal.Main(
         external=models.AppBskyEmbedExternal.External(
