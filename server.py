@@ -49,8 +49,8 @@ def bluesky_post(message, item):
     newspaper_title = item['title']['title']
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     
-    embed_external = models.AppBskyEmbedExternal.Main(
-        external=models.AppBskyEmbedExternal.External(
+    embed_external = models.AppBskyEmbedExternal(
+        external=models.AppBskyEmbedExternalExternal(
             title=article_title,
             description=article_snippet,
             uri=article_url,
@@ -58,10 +58,10 @@ def bluesky_post(message, item):
     )
     
     post_with_link_card = bluesky_client.com.atproto.repo.create_record(
-        models.ComAtprotoRepoCreateRecord.Data(
+        data=models.ComAtprotoRepoCreateRecord(
             repo=bluesky_client.me.did,
             collection=models.ids.AppBskyFeedPost,
-            record=models.AppBskyFeedPost.Main(
+            record=models.AppBskyFeedPost(
                 created_at=bluesky_client.get_current_time_iso(),
                 text=message,
                 embed=embed_external
