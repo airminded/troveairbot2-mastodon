@@ -112,6 +112,7 @@ def get_random_facet_value(params, facet):
     '''
     these_params = params.copy()
     these_params['facet'] = facet
+    these_params['category'] = 'newspaper'
     try:
         response = session.get(API_URL, params=these_params)
         data = response.json()
@@ -127,6 +128,7 @@ def get_random_facet_value(params, facet):
 
 
 def get_total_results(params):
+    params['category'] = 'newspaper'
     try:
         response = session.get(API_URL, params=params)
         data = response.json()
@@ -156,7 +158,8 @@ def get_random_article(query, **kwargs):
         'zone': 'newspaper',
         'encoding': 'json',
         'n': '0',
-        'key': API_KEY
+        'key': API_KEY,
+        'category': 'newspaper'
     }
     if query:
         params['q'] = query
