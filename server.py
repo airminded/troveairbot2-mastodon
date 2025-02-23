@@ -61,8 +61,8 @@ def bluesky_post(message, item):
         data=models.ComAtprotoRepoCreateRecord(
             repo=bluesky_client.me.did,
             collection=models.ids.AppBskyFeedPost,
-            record=models.AppBskyFeedPost(
-                created_at=bluesky_client.get_current_time_iso(),
+            record=record,
+                createdAt=bluesky_client.get_current_time_iso(),
                 text=message,
                 embed=embed_external
             ),
