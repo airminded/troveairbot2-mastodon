@@ -49,13 +49,20 @@ def bluesky_post(message, item):
     newspaper_title = item['title']['title']
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
 
-    embed_external = models.AppBskyEmbedExternal(
-        external=models.AppBskyEmbedExternal.External(
-            title=article_title,
-            description=article_snippet,
-            uri=article_url,
-        )
+    #embed_external = models.AppBskyEmbedExternal(
+    #    external=models.AppBskyEmbedExternal.External(
+    #        title=article_title,
+    #        description=article_snippet,
+    #        uri=article_url,
+    #    )
+    #)
+
+    embed_external = models.AppBskyEmbedExternal.External(  # Corrected!
+        title=article_title,
+        description=article_snippet,
+        uri=article_url,
     )
+
 
     record = models.AppBskyFeedPost.Record(  # Ensure proper wrapping
         createdAt=bluesky_client.get_current_time_iso(),  # Now bluesky_client is defined
