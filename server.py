@@ -40,15 +40,15 @@ def mastodon_post(message):
 
 
 def bluesky_post(message, item):
-    bluesky_client = Client()
-    bluesky_client.login(BLUESKY_EMAIL, BLUESKY_PASSWORD)
-    
+    bluesky_client = Client()  # Initialize here
+    bluesky_client.login(BLUESKY_EMAIL, BLUESKY_PASSWORD)  # Authenticate
+
     article_url = f'http://nla.gov.au/nla.news-article{item["id"]}'
     article_title = truncate_text(item['heading'], 200)
     article_snippet = item['snippet']
     newspaper_title = item['title']['title']
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
-    
+
     embed_external = models.AppBskyEmbedExternal(
         external=models.AppBskyEmbedExternal.External(
             title=article_title,
@@ -56,24 +56,21 @@ def bluesky_post(message, item):
             uri=article_url,
         )
     )
-    
-record = models.AppBskyFeedPost.Record(
-    createdAt=bluesky_client.get_current_time_iso(),
-    text=message,
-    embed=embed_external
-)
 
-post_with_link_card = bluesky_client.com.atproto.repo.create_record(
-    data=models.ComAtprotoRepoCreateRecord(
-        repo=bluesky_client.me.did,
-        collection=models.ids.AppBskyFeedPost,
-        record=models.AppBskyFeedPost.Record(  # Ensure this is correctly wrapped
-            createdAt=bluesky_client.get_current_time_iso(),
-            text=message,
-            embed=embed_external
+    record = models.AppBskyFeedPost.Record(  # Ensure proper wrapping
+        createdAt=bluesky_client.get_current_time_iso(),  # Now bluesky_client is defined
+        text=message,
+        embed=embed_external
+    )
+
+    post_with_link_card = bluesky_client.com.atproto.repo.create_record(
+        data=models.ComAtprotoRepoCreateRecord(
+            repo=bluesky_client.me.did,
+            collection=models.ids.AppBskyFeedPost,
+            record=record
         )
     )
-)
+
 
 
 def truncate_text(text, length):
