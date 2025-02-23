@@ -57,17 +57,20 @@ def bluesky_post(message, item):
         )
     )
     
-    post_with_link_card = bluesky_client.com.atproto.repo.create_record(
-        data=models.ComAtprotoRepoCreateRecord(
-            repo=bluesky_client.me.did,
-            collection=models.ids.AppBskyFeedPost,
-            record=record,
-                createdAt=bluesky_client.get_current_time_iso(),
-                text=message,
-                embed=embed_external
-            ),
-        )
+record = models.AppBskyFeedPost.Record(
+    createdAt=bluesky_client.get_current_time_iso(),
+    text=message,
+    embed=embed_external
+)
+
+post_with_link_card = bluesky_client.com.atproto.repo.create_record(
+    data=models.ComAtprotoRepoCreateRecord(
+        repo=bluesky_client.me.did,
+        collection=models.ids.AppBskyFeedPost,
+        record=record,  # Just pass the existing 'record' here
     )
+)
+
 
 
 def truncate_text(text, length):
