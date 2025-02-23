@@ -75,7 +75,7 @@ def bluesky_post(message, item):
     )
 
     post_with_link_card = bluesky_client.com.atproto.repo.create_record(
-        data=models.ComAtprotoRepoCreateRecord(
+        data=models.ComAtprotoRepoCreateRecord.Main(
             repo=bluesky_client.me.did,
             collection=models.ids.AppBskyFeedPost,
             record=record
