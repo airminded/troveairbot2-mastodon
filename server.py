@@ -67,10 +67,13 @@ post_with_link_card = bluesky_client.com.atproto.repo.create_record(
     data=models.ComAtprotoRepoCreateRecord(
         repo=bluesky_client.me.did,
         collection=models.ids.AppBskyFeedPost,
-        record=record,  # Just pass the existing 'record' here
+        record=models.AppBskyFeedPost.Record(  # Ensure this is correctly wrapped
+            createdAt=bluesky_client.get_current_time_iso(),
+            text=message,
+            embed=embed_external
+        )
     )
 )
-
 
 
 def truncate_text(text, length):
