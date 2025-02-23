@@ -57,11 +57,15 @@ def bluesky_post(message, item):
     #    )
     #)
 
-    embed_external = models.AppBskyEmbedExternal.External(  # Corrected!
-        title=article_title,
-        description=article_snippet,
-        uri=article_url,
+    embed_external = models.AppBskyEmbedExternal(
+        external=models.AppBskyEmbedExternal.External(
+            title=article_title,
+            description=article_snippet,
+            uri=article_url,
+        ),
+        **{"$type": "app.bsky.embed.external"}
     )
+
 
 
     record = models.AppBskyFeedPost.Record(  # Ensure proper wrapping
