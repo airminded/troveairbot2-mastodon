@@ -57,7 +57,7 @@ def bluesky_post(message, item):
     #    )
     #)
 
-    embed_external = models.AppBskyEmbedExternal(
+    embed_external = models.AppBskyEmbedExternal.Main(
         external=models.AppBskyEmbedExternal.External(
             title=article_title,
             description=article_snippet,
