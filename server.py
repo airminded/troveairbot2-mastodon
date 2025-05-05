@@ -27,7 +27,8 @@ KEYWORDS = os.environ.get('KEYWORDS')
 API_URL = 'https://api.trove.nla.gov.au/v3/result'
 BLUESKY_EMAIL = os.environ.get('BLUESKY_EMAIL')
 BLUESKY_PASSWORD = os.environ.get('BLUESKY_PASSWORD')
-
+BLUESKY_CHARACTER_LIMIT = 300
+MASTODON_CHARACTER_LIMIT = 500
 
 def mastodon_post(message):
     mastodon_url = "https://" + INSTANCE + "/api/v1/statuses"
@@ -108,10 +109,10 @@ def prepare_mastodon_post(item, key):
     greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     title = truncate_text(item['heading'], 200)
-    newspaper_title = clean_newspaper_title(item['title']['title'])  # Clean up the title
+    newspaper_title = clean_newspaper_title(item['title']['title'])
     url = f'http://nla.gov.au/nla.news-article{item["id"]}'
-    message = f'{greeting} {newspaper_title}, {date}, "{title}" : {url}'
-    return message
+    message = f'{greeting} {date}, "{title}" from "{newspaper_title}": {url}'
+    return truncate_message(message, MASTODON_CHARACTER_LIMIT)  # Use the constant
 
 
 # def prepare_bluesky_post(item, key):
@@ -126,9 +127,9 @@ def prepare_bluesky_post(item, key):
     greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     title = truncate_text(item['heading'], 200)
-    newspaper_title = clean_newspaper_title(item['title']['title'])  # Clean up the title
-    message = f'{greeting} {newspaper_title}, {date}, "{title}" : {url}'
-    return message
+    newspaper_title = clean_newspaper_title(item['title']['title'])
+    message = f'{greeting} {date}, "{title}" from "{newspaper_title}"'
+    return truncate_message(message, BLUESKY_CHARACTER_LIMIT)
 
 
 def is_authorized(request):
