@@ -4,6 +4,7 @@ import os
 import json
 import random
 import arrow
+import re
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from atproto import Client, models
@@ -89,6 +90,10 @@ def truncate_text(text, length):
         text = '{}...'.format(text[:length])
     return text
 
+def clean_newspaper_title(title):
+    # Use regex to remove parentheses and their content
+    return re.sub(r'\s*\(.*?\)', '', title).strip()
+
 
 #def prepare_mastodon_post(item, key):
 #    greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
@@ -103,7 +108,7 @@ def prepare_mastodon_post(item, key):
     greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     title = truncate_text(item['heading'], 200)
-    newspaper_title = item['title']['title']  # Extract the newspaper title
+    newspaper_title = clean_newspaper_title(item['title']['title'])  # Clean up the title
     url = f'http://nla.gov.au/nla.news-article{item["id"]}'
     message = f'{greeting} {date}, "{title}" from "{newspaper_title}": {url}'
     return message
@@ -121,7 +126,7 @@ def prepare_bluesky_post(item, key):
     greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     title = truncate_text(item['heading'], 200)
-    newspaper_title = item['title']['title']  # Extract the newspaper title
+    newspaper_title = clean_newspaper_title(item['title']['title'])  # Clean up the title
     message = f'{greeting} {date}, "{title}" from "{newspaper_title}"'
     return message
 
