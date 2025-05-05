@@ -90,22 +90,39 @@ def truncate_text(text, length):
     return text
 
 
+#def prepare_mastodon_post(item, key):
+#    greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
+#    details = None
+#    date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
+#    title = truncate_text(item['heading'], 200)
+#    url = f'http://nla.gov.au/nla.news-article{item["id"]}'
+#    message = f'{greeting} {date}, "{title}": {url}'
+#    return message
+
 def prepare_mastodon_post(item, key):
     greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
-    details = None
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     title = truncate_text(item['heading'], 200)
+    newspaper_title = item['title']['title']  # Extract the newspaper title
     url = f'http://nla.gov.au/nla.news-article{item["id"]}'
-    message = f'{greeting} {date}, "{title}": {url}'
+    message = f'{greeting} {date}, "{title}" from "{newspaper_title}": {url}'
     return message
 
 
+# def prepare_bluesky_post(item, key):
+#    greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
+#    details = None
+#    date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
+#    title = truncate_text(item['heading'], 200)
+#    message = f'{greeting} {date}, "{title}"'
+#    return message
+
 def prepare_bluesky_post(item, key):
     greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
-    details = None
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     title = truncate_text(item['heading'], 200)
-    message = f'{greeting} {date}, "{title}"'
+    newspaper_title = item['title']['title']  # Extract the newspaper title
+    message = f'{greeting} {date}, "{title}" from "{newspaper_title}"'
     return message
 
 
