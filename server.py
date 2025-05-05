@@ -4,6 +4,7 @@ import os
 import json
 import random
 import arrow
+import re
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from atproto import Client, models
@@ -26,7 +27,8 @@ KEYWORDS = os.environ.get('KEYWORDS')
 API_URL = 'https://api.trove.nla.gov.au/v3/result'
 BLUESKY_EMAIL = os.environ.get('BLUESKY_EMAIL')
 BLUESKY_PASSWORD = os.environ.get('BLUESKY_PASSWORD')
-
+BLUESKY_CHARACTER_LIMIT = 300
+MASTODON_CHARACTER_LIMIT = 500
 
 def mastodon_post(message):
     mastodon_url = "https://" + INSTANCE + "/api/v1/statuses"
@@ -89,24 +91,49 @@ def truncate_text(text, length):
         text = '{}...'.format(text[:length])
     return text
 
+def clean_newspaper_title(title):
+    # Use regex to remove parentheses and their content
+    return re.sub(r'\s*\(.*?\)', '', title).strip()
+
+def truncate_message(message, limit):
+    if len(message) > limit:
+        return '{}...'.format(message[:limit - 3])  # Account for '...' at the end
+    return message
+
+#def prepare_mastodon_post(item, key):
+#    greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
+#    details = None
+#    date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
+#    title = truncate_text(item['heading'], 200)
+#    url = f'http://nla.gov.au/nla.news-article{item["id"]}'
+#    message = f'{greeting} {date}, "{title}": {url}'
+#    return message
 
 def prepare_mastodon_post(item, key):
     greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
-    details = None
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     title = truncate_text(item['heading'], 200)
+    newspaper_title = clean_newspaper_title(item['title']['title'])
     url = f'http://nla.gov.au/nla.news-article{item["id"]}'
-    message = f'{greeting} {date}, "{title}": {url}'
-    return message
+    message = f'{greeting} {newspaper_title}, {date}, "{title}": {url}'
+    return truncate_message(message, MASTODON_CHARACTER_LIMIT)  # Use the constant
 
+
+# def prepare_bluesky_post(item, key):
+#    greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
+#    details = None
+#    date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
+#    title = truncate_text(item['heading'], 200)
+#    message = f'{greeting} {date}, "{title}"'
+#    return message
 
 def prepare_bluesky_post(item, key):
     greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
-    details = None
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     title = truncate_text(item['heading'], 200)
-    message = f'{greeting} {date}, "{title}"'
-    return message
+    newspaper_title = clean_newspaper_title(item['title']['title'])
+    message = f'{greeting} {newspaper_title}, {date}, "{title}": {url}'
+    return truncate_message(message, BLUESKY_CHARACTER_LIMIT)
 
 
 def is_authorized(request):
