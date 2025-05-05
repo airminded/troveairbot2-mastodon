@@ -111,7 +111,7 @@ def prepare_mastodon_post(item, key):
     title = truncate_text(item['heading'], 200)
     newspaper_title = clean_newspaper_title(item['title']['title'])
     url = f'http://nla.gov.au/nla.news-article{item["id"]}'
-    message = f'{greeting} {date}, "{title}" from "{newspaper_title}": {url}'
+    message = f'{greeting} {newspaper_title}, {date}, "{title}": {url}'
     return truncate_message(message, MASTODON_CHARACTER_LIMIT)  # Use the constant
 
 
@@ -128,7 +128,7 @@ def prepare_bluesky_post(item, key):
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
     title = truncate_text(item['heading'], 200)
     newspaper_title = clean_newspaper_title(item['title']['title'])
-    message = f'{greeting} {date}, "{title}" from "{newspaper_title}"'
+    message = f'{greeting} {newspaper_title}, {date}, "{title}": {url}'
     return truncate_message(message, BLUESKY_CHARACTER_LIMIT)
 
 
