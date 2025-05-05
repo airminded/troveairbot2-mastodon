@@ -95,6 +95,10 @@ def clean_newspaper_title(title):
     # Use regex to remove parentheses and their content
     return re.sub(r'\s*\(.*?\)', '', title).strip()
 
+def truncate_message(message, limit):
+    if len(message) > limit:
+        return '{}...'.format(message[:limit - 3])  # Account for '...' at the end
+    return message
 
 #def prepare_mastodon_post(item, key):
 #    greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
