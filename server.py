@@ -84,12 +84,13 @@ def truncate_text(text, length):
 
 def clean_newspaper_title(title):
     # Use regex to remove parentheses and their content and trailing periods
-    original_title = title  # Save the original input for logging
     title = re.sub(r'\s*\(.*?\)', '', title).strip()
-    cleaned_title = title.rstrip('.')
-    # Log the input and output
-    print(f"clean_newspaper_title - Input: '{original_title}', Output: '{cleaned_title}'")
-    return cleaned_title
+    return title.rstrip('.')
+
+
+def clean_article_heading(heading):
+    # Strip trailing periods
+    return heading.rstrip('.')
 
 
 def truncate_message(message, limit):
@@ -101,17 +102,17 @@ def truncate_message(message, limit):
 def prepare_mastodon_post(item, key):
     greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
-    title = truncate_text(item['heading'], 200)
+    title = clean_article_heading(truncate_text(item['heading'], 200))  # Apply the new function here
     newspaper_title = clean_newspaper_title(item['title']['title'])
     url = f'http://nla.gov.au/nla.news-article{item["id"]}'
     message = f'{greeting} "{title}", {newspaper_title}, {date} {url}'
     return truncate_message(message, MASTODON_CHARACTER_LIMIT)
-
+    
 
 def prepare_bluesky_post(item, key):
     greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
-    title = truncate_text(item['heading'], 200)
+    title = clean_article_heading(truncate_text(item['heading'], 200))  # Apply the new function here
     newspaper_title = clean_newspaper_title(item['title']['title'])
     message = f'{greeting} "{title}", {newspaper_title}, {date}'
     return truncate_message(message, BLUESKY_CHARACTER_LIMIT)
