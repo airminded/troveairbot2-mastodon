@@ -172,7 +172,7 @@ def get_random_article(query, **kwargs):
     facets = []
     tries = 0
     params = {
-        'zone': 'fulltext',
+#        'zone': 'fulltext',
 #        'zone': 'newspaper',
         'encoding': 'json',
         'n': '0',
