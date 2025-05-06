@@ -168,7 +168,8 @@ def get_random_article(query, **kwargs):
     print(query)
     total = 0
     applied_facets = []
-    facets = ['month', 'year', 'decade', 'word', 'illustrated', 'category', 'title']
+#    facets = ['month', 'year', 'decade', 'word', 'illustrated', 'category', 'title']
+    facets = []
     tries = 0
     params = {
         'zone': 'fulltext',
