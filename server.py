@@ -88,6 +88,11 @@ def clean_newspaper_title(title):
     return title.rstrip('.')
 
 
+def clean_article_heading(heading):
+    # Strip trailing periods
+    return heading.rstrip('.')
+
+
 def truncate_message(message, limit):
     if len(message) > limit:
         return '{}...'.format(message[:limit - 3])  # Account for '...' at the end
@@ -97,17 +102,17 @@ def truncate_message(message, limit):
 def prepare_mastodon_post(item, key):
     greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
-    title = truncate_text(item['heading'], 200)
+    title = clean_article_heading(truncate_text(item['heading'], 200))  # Apply the new function here
     newspaper_title = clean_newspaper_title(item['title']['title'])
     url = f'http://nla.gov.au/nla.news-article{item["id"]}'
     message = f'{greeting} "{title}", {newspaper_title}, {date} {url}'
     return truncate_message(message, MASTODON_CHARACTER_LIMIT)
-
+    
 
 def prepare_bluesky_post(item, key):
     greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
-    title = truncate_text(item['heading'], 200)
+    title = clean_article_heading(truncate_text(item['heading'], 200))  # Apply the new function here
     newspaper_title = clean_newspaper_title(item['title']['title'])
     message = f'{greeting} "{title}", {newspaper_title}, {date}'
     return truncate_message(message, BLUESKY_CHARACTER_LIMIT)
@@ -166,7 +171,7 @@ def get_random_article(query, **kwargs):
     facets = ['month', 'year', 'decade', 'word', 'illustrated', 'category', 'title']
     tries = 0
     params = {
-        'zone': 'newspaper',
+#        'zone': 'newspaper',
         'encoding': 'json',
         'n': '0',
         'key': API_KEY,
