@@ -84,8 +84,12 @@ def truncate_text(text, length):
 
 def clean_newspaper_title(title):
     # Use regex to remove parentheses and their content and trailing periods
+    original_title = title  # Save the original input for logging
     title = re.sub(r'\s*\(.*?\)', '', title).strip()
-    return title.rstrip('.')
+    cleaned_title = title.rstrip('.')
+    # Log the input and output
+    print(f"clean_newspaper_title - Input: '{original_title}', Output: '{cleaned_title}'")
+    return cleaned_title
 
 
 def truncate_message(message, limit):
