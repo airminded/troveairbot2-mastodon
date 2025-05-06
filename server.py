@@ -171,7 +171,8 @@ def get_random_article(query, **kwargs):
     facets = ['month', 'year', 'decade', 'word', 'illustrated', 'category', 'title']
     tries = 0
     params = {
-        'zone': 'newspaper',
+        'zone': 'fulltext',
+#        'zone': 'newspaper',
         'encoding': 'json',
         'n': '0',
         'key': API_KEY,
