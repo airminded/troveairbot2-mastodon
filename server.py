@@ -171,17 +171,18 @@ def get_random_article(query, **kwargs):
     facets = ['month', 'year', 'decade', 'word', 'illustrated', 'category', 'title']
     tries = 0
     params = {
-#        'zone': 'newspaper',
         'encoding': 'json',
         'n': '0',
         'key': API_KEY,
         'category': 'newspaper'
     }
+
+    # Modify the query to prepend "fulltext:" for full-text searches
     if query:
-        params['q'] = query
+        params['q'] = f'fulltext:{query}'  # Prepend "fulltext:" to the keyword
     else:
         random_word = random.choice(STOPWORDS)
-        params['q'] = f'"{random_word}"'
+        params['q'] = f'fulltext:"{random_word}"'  # Prepend "fulltext:" to random STOPWORDS
 
     for key, value in kwargs.items():
         params[f'l-{key}'] = value
@@ -193,7 +194,7 @@ def get_random_article(query, **kwargs):
     while total == 0 and tries <= 10:
         if not query:
             random_word = random.choice(STOPWORDS)
-            params['q'] = f'"{random_word}"'
+            params['q'] = f'fulltext:"{random_word}"'  # Ensure "fulltext:" is prepended to random STOPWORDS
         tries += 1
 
     while total > 100 and len(facets) > 0:
