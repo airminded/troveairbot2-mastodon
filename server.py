@@ -177,12 +177,12 @@ def get_random_article(query, **kwargs):
         'category': 'newspaper'
     }
 
-    # Modify the query to prepend "text:" for full-text searches
+    # Modify the query to prepend "fulltext:" for full-text searches
     if query:
-        params['q'] = f'text:{query}'  # Prepend "text:" to the keyword
+        params['q'] = f'fulltext:{query}'  # Prepend "fulltext:" to the keyword
     else:
         random_word = random.choice(STOPWORDS)
-        params['q'] = f'text:"{random_word}"'  # Prepend "text:" to random STOPWORDS
+        params['q'] = f'fulltext:"{random_word}"'  # Prepend "fulltext:" to random STOPWORDS
 
     for key, value in kwargs.items():
         params[f'l-{key}'] = value
@@ -194,7 +194,7 @@ def get_random_article(query, **kwargs):
     while total == 0 and tries <= 10:
         if not query:
             random_word = random.choice(STOPWORDS)
-            params['q'] = f'text:"{random_word}"'  # Ensure "text:" is prepended to random STOPWORDS
+            params['q'] = f'fulltext:"{random_word}"'  # Ensure "fulltext:" is prepended to random STOPWORDS
         tries += 1
 
     while total > 100 and len(facets) > 0:
