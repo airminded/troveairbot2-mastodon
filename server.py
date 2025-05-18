@@ -211,7 +211,7 @@ def get_random_article(query, **kwargs):
         try:
             response = session.get(API_URL, params=params)
             data = response.json()
-            print(data)
+           # print(data)
             if 'category' in data and len(data['category']) > 0:
                 articles = data['category'][0]['records']['article']
                 N_candidate = len(articles)
@@ -238,7 +238,7 @@ def post_random():
     status = 'nothing to post'
     if is_authorized(request):
         keyword = random.choice(KEYWORDS.split(','))
-        print(keyword)
+        # print(keyword)
         article = get_random_article(keyword, category='Article')
         if article:
             message = prepare_mastodon_post(article, keyword)
