@@ -137,7 +137,7 @@ def get_random_facet_value(params, facet):
     try:
         response = session.get(API_URL, params=these_params)
         data = response.json()
-        print(data)
+       # print(data)
         try:
             values = [t['search'] for t in data['category'][0]['facets'][facet]['term']]
         except (TypeError, KeyError):
@@ -153,7 +153,7 @@ def get_total_results(params):
     try:
         response = session.get(API_URL, params=params)
         data = response.json()
-        print(data)
+       # print(data)
         if 'category' in data and len(data['category']) > 0:
             total = int(data['category'][0]['records']['total'])
         else:
@@ -165,7 +165,7 @@ def get_total_results(params):
 
 
 def get_random_article(query, **kwargs):
-    print(query)
+   # print(query)
     total = 0
     applied_facets = []
     facets = ['month', 'year', 'decade', 'word', 'illustrated', 'category', 'title']
@@ -179,10 +179,10 @@ def get_random_article(query, **kwargs):
 
     # Modify the query to prepend "fulltext:" for full-text searches
     if query:
-        params['q'] = f'fulltext:{query}'  # Prepend "fulltext:" to the keyword
+        params['q'] = f'fulltext:{query}'
     else:
         random_word = random.choice(STOPWORDS)
-        params['q'] = f'fulltext:"{random_word}"'  # Prepend "fulltext:" to random STOPWORDS
+        params['q'] = f'fulltext:"{random_word}"'
 
     for key, value in kwargs.items():
         params[f'l-{key}'] = value
@@ -191,10 +191,13 @@ def get_random_article(query, **kwargs):
     facets[:] = [f for f in facets if f not in applied_facets]
     total = get_total_results(params)
 
+    # Log N_total
+    print(f"N_total (total number of articles matching query): {total}")
+
     while total == 0 and tries <= 10:
         if not query:
             random_word = random.choice(STOPWORDS)
-            params['q'] = f'fulltext:"{random_word}"'  # Ensure "fulltext:" is prepended to random STOPWORDS
+            params['q'] = f'fulltext:"{random_word}"'
         tries += 1
 
     while total > 100 and len(facets) > 0:
@@ -202,14 +205,25 @@ def get_random_article(query, **kwargs):
         params[f'l-{facet}'] = get_random_facet_value(params, facet)
         total = get_total_results(params)
 
+    N_candidate = 0
     if total > 0:
         params['n'] = '100'
         try:
             response = session.get(API_URL, params=params)
             data = response.json()
-            print(data)
+           # print(data)
             if 'category' in data and len(data['category']) > 0:
-                article = random.choice(data['category'][0]['records']['article'])
+                articles = data['category'][0]['records']['article']
+                N_candidate = len(articles)
+
+                # Calculate proportion
+                proportion = N_candidate / total if total > 0 else 0
+
+                # Log N_candidate and Proportion
+                print(f"N_candidate (number of articles in final candidate set): {N_candidate}")
+                print(f"Proportion: {proportion:.6f}")
+
+                article = random.choice(articles)
                 print(article)
                 return article
             else:
@@ -224,7 +238,7 @@ def post_random():
     status = 'nothing to post'
     if is_authorized(request):
         keyword = random.choice(KEYWORDS.split(','))
-        print(keyword)
+        # print(keyword)
         article = get_random_article(keyword, category='Article')
         if article:
             message = prepare_mastodon_post(article, keyword)
