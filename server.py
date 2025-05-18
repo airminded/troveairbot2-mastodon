@@ -137,7 +137,7 @@ def get_random_facet_value(params, facet):
     try:
         response = session.get(API_URL, params=these_params)
         data = response.json()
-        print(data)
+       # print(data)
         try:
             values = [t['search'] for t in data['category'][0]['facets'][facet]['term']]
         except (TypeError, KeyError):
@@ -153,7 +153,7 @@ def get_total_results(params):
     try:
         response = session.get(API_URL, params=params)
         data = response.json()
-        print(data)
+       # print(data)
         if 'category' in data and len(data['category']) > 0:
             total = int(data['category'][0]['records']['total'])
         else:
@@ -165,7 +165,7 @@ def get_total_results(params):
 
 
 def get_random_article(query, **kwargs):
-    print(query)
+   # print(query)
     total = 0
     applied_facets = []
     facets = ['month', 'year', 'decade', 'word', 'illustrated', 'category', 'title']
