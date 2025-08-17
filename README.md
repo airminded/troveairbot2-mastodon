@@ -2,6 +2,8 @@
 
 (~~Bluesky notes coming soon~~...)
 
+20250818: added ability to filter Trove results by a year range (START_YEAR to END_YEAR). This are optional; if either variable is not set the behaviour defaults to searching all available years
+
 20250222: updated to use Trove API V3: https://api.trove.nla.gov.au/v3/index.html
 
 Modified by [Brett Holman](https://airminded.org) to post to Mastodon instead of Twitter. It is now optimised to run on Heroku (rather than Glitch). The following config vars will need to be defined on Heroku:
