@@ -134,6 +134,7 @@ def get_random_facet_value(params, facet):
         return None
 
 def get_total_results(params):
+    params = params.copy()
     params.append(('category', 'newspaper'))
     try:
         response = session.get(API_URL, params=params)
@@ -154,7 +155,7 @@ def get_random_article(query, **kwargs):
     facets = ['month', 'year', 'decade', 'word', 'illustrated', 'category', 'title']
     tries = 0
 
-    # Build params as a list of tuples for repeated l-year
+    # Build params as a list of tuples for repeated parameters
     params = [
         ('encoding', 'json'),
         ('n', '0'),
@@ -162,14 +163,16 @@ def get_random_article(query, **kwargs):
         ('category', 'newspaper')
     ]
 
-    # Add year range from environment variables if BOTH are set
+    # Year and Decade logic: only one year per query, must also set l-decade
+    selected_year = None
     if START_YEAR and END_YEAR:
         try:
             start = int(START_YEAR)
             end = int(END_YEAR)
             if start <= end:
-                for year in range(start, end + 1):
-                    params.append(('l-year', str(year)))
+                selected_year = random.randint(start, end)
+                params.append(('l-year', str(selected_year)))
+                params.append(('l-decade', str(selected_year)[:3]))
         except ValueError:
             pass
 
@@ -185,31 +188,21 @@ def get_random_article(query, **kwargs):
         applied_facets.append(key)
 
     facets[:] = [f for f in facets if f not in applied_facets]
-    total = get_total_results(params.copy())
-
+    response = session.get(API_URL, params=params)
+    print("Request URL:", response.url)
+    data = response.json()
+    total = 0
+    if 'category' in data and len(data['category']) > 0:
+        total = int(data['category'][0]['records']['total'])
     print(f"N_total (total number of articles matching query): {total}")
-
-    while total == 0 and tries <= 10:
-        if not query:
-            random_word = random.choice(STOPWORDS)
-            params.append(('q', f'fulltext:"{random_word}"'))
-        tries += 1
-
-    while total > 100 and len(facets) > 0:
-        facet = facets.pop()
-        facet_value = get_random_facet_value(params.copy(), facet)
-        if facet_value:
-            params.append((f'l-{facet}', facet_value))
-        total = get_total_results(params.copy())
 
     N_candidate = 0
     if total > 0:
-        # Get a candidate set
         candidate_params = params.copy()
-        candidate_params = [p for p in candidate_params if p[0] != 'n']  # Remove any existing 'n'
+        candidate_params = [p for p in candidate_params if p[0] != 'n']
         candidate_params.append(('n', '100'))
         response = session.get(API_URL, params=candidate_params)
-        print("get_random_article candidate request URL:", response.url)
+        print("Candidate set request URL:", response.url)
         data = response.json()
         if 'category' in data and len(data['category']) > 0:
             articles = data['category'][0]['records']['article']
