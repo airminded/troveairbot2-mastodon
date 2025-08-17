@@ -30,6 +30,9 @@ BLUESKY_PASSWORD = os.environ.get('BLUESKY_PASSWORD')
 BLUESKY_CHARACTER_LIMIT = 300
 MASTODON_CHARACTER_LIMIT = 500
 
+# New: Read year limits from environment; do not filter by year if not set.
+START_YEAR = os.environ.get('START_YEAR')
+END_YEAR = os.environ.get('END_YEAR')
 
 def mastodon_post(message):
     mastodon_url = "https://" + INSTANCE + "/api/v1/statuses"
@@ -40,7 +43,6 @@ def mastodon_post(message):
     }
     data = {'status': message}
     response = requests.request(method="POST", url=mastodon_url, data=json.dumps(data), headers=headers)
-
 
 def bluesky_post(message, item):
     bluesky_client = Client()  # Initialize here
@@ -61,8 +63,8 @@ def bluesky_post(message, item):
         **{"$type": "app.bsky.embed.external"}
     )
 
-    record = models.AppBskyFeedPost.Record(  # Ensure proper wrapping
-        createdAt=bluesky_client.get_current_time_iso(),  # Now bluesky_client is defined
+    record = models.AppBskyFeedPost.Record(
+        createdAt=bluesky_client.get_current_time_iso(),
         text=message,
         embed=embed_external
     )
@@ -75,48 +77,39 @@ def bluesky_post(message, item):
         )
     )
 
-
 def truncate_text(text, length):
     if len(text) > length:
         text = '{}...'.format(text[:length])
     return text
 
-
 def clean_newspaper_title(title):
-    # Use regex to remove parentheses and their content and trailing periods
     title = re.sub(r'\s*\(.*?\)', '', title).strip()
     return title.rstrip('.')
 
-
 def clean_article_heading(heading):
-    # Strip trailing periods
     return heading.rstrip('.')
-
 
 def truncate_message(message, limit):
     if len(message) > limit:
-        return '{}...'.format(message[:limit - 3])  # Account for '...' at the end
+        return '{}...'.format(message[:limit - 3])
     return message
-
 
 def prepare_mastodon_post(item, key):
     greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
-    title = clean_article_heading(truncate_text(item['heading'], 200))  # Apply the new function here
+    title = clean_article_heading(truncate_text(item['heading'], 200))
     newspaper_title = clean_newspaper_title(item['title']['title'])
     url = f'http://nla.gov.au/nla.news-article{item["id"]}'
     message = f'{greeting} "{title}", {newspaper_title}, {date} {url}'
     return truncate_message(message, MASTODON_CHARACTER_LIMIT)
     
-
 def prepare_bluesky_post(item, key):
     greeting = 'This historical Australian newspaper article contains the keyword ' + key + ':'
     date = arrow.get(item['date'], 'YYYY-MM-DD').format('D MMM YYYY')
-    title = clean_article_heading(truncate_text(item['heading'], 200))  # Apply the new function here
+    title = clean_article_heading(truncate_text(item['heading'], 200))
     newspaper_title = clean_newspaper_title(item['title']['title'])
     message = f'{greeting} "{title}", {newspaper_title}, {date}'
     return truncate_message(message, BLUESKY_CHARACTER_LIMIT)
-
 
 def is_authorized(request):
     if request.args.get('key') == APP_KEY:
@@ -124,11 +117,9 @@ def is_authorized(request):
     else:
         return False
 
-
 @app.route('/')
 def home():
     return 'hello, I\'m ready to post'
-
 
 def get_random_facet_value(params, facet):
     these_params = params.copy()
@@ -137,7 +128,6 @@ def get_random_facet_value(params, facet):
     try:
         response = session.get(API_URL, params=these_params)
         data = response.json()
-       # print(data)
         try:
             values = [t['search'] for t in data['category'][0]['facets'][facet]['term']]
         except (TypeError, KeyError):
@@ -147,13 +137,11 @@ def get_random_facet_value(params, facet):
         print(f"RetryError: {e}")
         return None
 
-
 def get_total_results(params):
     params['category'] = 'newspaper'
     try:
         response = session.get(API_URL, params=params)
         data = response.json()
-       # print(data)
         if 'category' in data and len(data['category']) > 0:
             total = int(data['category'][0]['records']['total'])
         else:
@@ -163,9 +151,7 @@ def get_total_results(params):
         print(f"RetryError: {e}")
         return 0
 
-
 def get_random_article(query, **kwargs):
-   # print(query)
     total = 0
     applied_facets = []
     facets = ['month', 'year', 'decade', 'word', 'illustrated', 'category', 'title']
@@ -176,6 +162,16 @@ def get_random_article(query, **kwargs):
         'key': API_KEY,
         'category': 'newspaper'
     }
+
+    # Add year range from environment variables if BOTH are set
+    if START_YEAR and END_YEAR:
+        try:
+            start = int(START_YEAR)
+            end = int(END_YEAR)
+            year_list = ','.join(str(year) for year in range(start, end + 1))
+            params['l-year'] = year_list
+        except ValueError:
+            pass  # Ignore and do not filter by year if not valid
 
     # Modify the query to prepend "fulltext:" for full-text searches
     if query:
@@ -191,7 +187,6 @@ def get_random_article(query, **kwargs):
     facets[:] = [f for f in facets if f not in applied_facets]
     total = get_total_results(params)
 
-    # Log N_total
     print(f"N_total (total number of articles matching query): {total}")
 
     while total == 0 and tries <= 10:
@@ -211,18 +206,12 @@ def get_random_article(query, **kwargs):
         try:
             response = session.get(API_URL, params=params)
             data = response.json()
-           # print(data)
             if 'category' in data and len(data['category']) > 0:
                 articles = data['category'][0]['records']['article']
                 N_candidate = len(articles)
-
-                # Calculate proportion
                 proportion = N_candidate / total if total > 0 else 0
-
-                # Log N_candidate and Proportion
                 print(f"N_candidate (number of articles in final candidate set): {N_candidate}")
                 print(f"Proportion: {proportion:.6f}")
-
                 article = random.choice(articles)
                 print(article)
                 return article
@@ -232,13 +221,11 @@ def get_random_article(query, **kwargs):
             print(f"RetryError: {e}")
             return None
 
-
 @app.route('/random/')
 def post_random():
     status = 'nothing to post'
     if is_authorized(request):
         keyword = random.choice(KEYWORDS.split(','))
-        # print(keyword)
         article = get_random_article(keyword, category='Article')
         if article:
             message = prepare_mastodon_post(article, keyword)
@@ -252,7 +239,6 @@ def post_random():
     else:
         status = 'sorry, not authorised to post'
     return status
-
 
 if __name__ == "__main__":
     from os import environ
