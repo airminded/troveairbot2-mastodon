@@ -30,7 +30,7 @@ BLUESKY_PASSWORD = os.environ.get('BLUESKY_PASSWORD')
 BLUESKY_CHARACTER_LIMIT = 300
 MASTODON_CHARACTER_LIMIT = 500
 
-# New: Read year limits from environment; do not filter by year if not set.
+# Year range from environment (do not filter if not set)
 START_YEAR = os.environ.get('START_YEAR')
 END_YEAR = os.environ.get('END_YEAR')
 
@@ -45,8 +45,8 @@ def mastodon_post(message):
     response = requests.request(method="POST", url=mastodon_url, data=json.dumps(data), headers=headers)
 
 def bluesky_post(message, item):
-    bluesky_client = Client()  # Initialize here
-    bluesky_client.login(BLUESKY_EMAIL, BLUESKY_PASSWORD)  # Authenticate
+    bluesky_client = Client()
+    bluesky_client.login(BLUESKY_EMAIL, BLUESKY_PASSWORD)
 
     article_url = f'http://nla.gov.au/nla.news-article{item["id"]}'
     article_title = truncate_text(item['heading'], 200)
@@ -69,7 +69,7 @@ def bluesky_post(message, item):
         embed=embed_external
     )
 
-    post_with_link_card = bluesky_client.com.atproto.repo.create_record(
+    bluesky_client.com.atproto.repo.create_record(
         data=models.ComAtprotoRepoCreateRecord.Data(
             repo=bluesky_client.me.did,
             collection=models.ids.AppBskyFeedPost,
@@ -112,10 +112,7 @@ def prepare_bluesky_post(item, key):
     return truncate_message(message, BLUESKY_CHARACTER_LIMIT)
 
 def is_authorized(request):
-    if request.args.get('key') == APP_KEY:
-        return True
-    else:
-        return False
+    return request.args.get('key') == APP_KEY
 
 @app.route('/')
 def home():
@@ -163,15 +160,15 @@ def get_random_article(query, **kwargs):
         'category': 'newspaper'
     }
 
-    # Add year range from environment variables if BOTH are set
+    # Correct year filter: add each year separately if both are set and valid
     if START_YEAR and END_YEAR:
         try:
             start = int(START_YEAR)
             end = int(END_YEAR)
-            year_list = ','.join(str(year) for year in range(start, end + 1))
-            params['l-year'] = year_list
+            if start <= end:
+                params['l-year'] = [str(year) for year in range(start, end + 1)]
         except ValueError:
-            pass  # Ignore and do not filter by year if not valid
+            pass  # Don't filter if values are invalid
 
     # Modify the query to prepend "fulltext:" for full-text searches
     if query:
