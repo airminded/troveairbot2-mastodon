@@ -1,7 +1,7 @@
 arrow==1.4.0
 atproto==0.0.65
 backports.functools-lru-cache==2.0.0
-certifi==2025.11.12
+certifi==2026.1.4
 chardet==5.2.0
 click==8.3.1
 Flask==3.1.2
@@ -16,5 +16,5 @@ requests==2.32.5
 requests-oauthlib==2.0.0
 six==1.17.0
 tweepy==4.16.0
-urllib3==2.6.1
-Werkzeug==3.1.4
+urllib3==2.6.3
+Werkzeug==3.1.5
